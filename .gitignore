@@ -204,6 +204,9 @@ cython_debug/
 # Ruff stuff:
 .ruff_cache/
 
+# Scratch / working files
+.scratch/
+
 # PyPI configuration file
 .pypirc
 

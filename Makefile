@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-LIBRARY_JSON := griptape-nodes-library.json
+LIBRARY_JSON := griptape_nodes_library_image_tiles/griptape-nodes-library.json
 PYPROJECT := pyproject.toml
 
 .PHONY: version/get

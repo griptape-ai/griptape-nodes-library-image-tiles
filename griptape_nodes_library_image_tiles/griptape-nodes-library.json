@@ -1,0 +1,96 @@
+{
+    "name": "Image Tiles Library",
+    "library_schema_version": "0.5.0",
+    "metadata": {
+        "author": "Griptape, Inc.",
+        "description": "Image tiling nodes: split images into square tiles for external editing, merge them back, and work with equirectangular panoramas.",
+        "library_version": "0.1.0",
+        "engine_version": "0.96.0",
+        "tags": ["Griptape", "Image", "Tiles", "Panorama", "360"],
+        "dependencies": {
+            "pip_dependencies": ["pillow", "numpy"]
+        },
+        "declarations": [
+            { "type": "lifecycle_stage", "stage": "BETA" }
+        ]
+    },
+    "widgets": [
+        {
+            "name": "Image360ViewerWidget",
+            "path": "widgets/Image360ViewerWidget.js",
+            "description": "Interactive equirectangular 360 image viewer with mouse drag and wheel zoom."
+        }
+    ],
+    "categories": [
+        {
+            "ImageTiles": {
+                "color": "border-cyan-500",
+                "title": "Image Tiles",
+                "description": "Split images into tiles, merge them back, and work with equirectangular panoramas.",
+                "icon": "Grid"
+            }
+        }
+    ],
+    "nodes": [
+        {
+            "class_name": "ImageTileSplitter",
+            "file_path": "image_tile_splitter.py",
+            "metadata": {
+                "category": "ImageTiles",
+                "description": "Split an image into square tiles and output a manifest JSON string for reassembly.",
+                "display_name": "Image Tile Splitter",
+                "declarations": [
+                    { "type": "lifecycle_stage", "stage": "BETA" }
+                ]
+            }
+        },
+        {
+            "class_name": "ImageTileMerger",
+            "file_path": "image_tile_merger.py",
+            "metadata": {
+                "category": "ImageTiles",
+                "description": "Merge tiles back into a single image using a manifest JSON string from the splitter.",
+                "display_name": "Image Tile Merger",
+                "declarations": [
+                    { "type": "lifecycle_stage", "stage": "BETA" }
+                ]
+            }
+        },
+        {
+            "class_name": "SeamBlend360",
+            "file_path": "seam_blend_360.py",
+            "metadata": {
+                "category": "ImageTiles",
+                "description": "Blend the left/right seam of a panoramic image to remove visible seams.",
+                "display_name": "360 Seam Blend",
+                "declarations": [
+                    { "type": "lifecycle_stage", "stage": "BETA" }
+                ]
+            }
+        },
+        {
+            "class_name": "ToLatLong2to1",
+            "file_path": "to_latlong_2to1.py",
+            "metadata": {
+                "category": "ImageTiles",
+                "description": "Convert any image into a 2:1 equirectangular canvas by padding, cropping, or stretching.",
+                "display_name": "To LatLong 2:1",
+                "declarations": [
+                    { "type": "lifecycle_stage", "stage": "BETA" }
+                ]
+            }
+        },
+        {
+            "class_name": "Image360Viewer",
+            "file_path": "image_360_viewer.py",
+            "metadata": {
+                "category": "ImageTiles",
+                "description": "Preview an equirectangular image in an interactive 360 spherical viewer.",
+                "display_name": "360 Image Viewer",
+                "declarations": [
+                    { "type": "lifecycle_stage", "stage": "BETA" }
+                ]
+            }
+        }
+    ]
+}
