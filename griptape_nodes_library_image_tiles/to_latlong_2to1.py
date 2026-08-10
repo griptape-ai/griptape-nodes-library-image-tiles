@@ -186,9 +186,7 @@ class ToLatLong2to1(DataNode):
         h = max(1, int(round(img.height * scale)))
         return img.resize((w, h), Image.Resampling.LANCZOS)
 
-    def _paste_centered(
-        self, fg: Image.Image, bg: Image.Image, target_w: int, target_h: int
-    ) -> Image.Image:
+    def _paste_centered(self, fg: Image.Image, bg: Image.Image, target_w: int, target_h: int) -> Image.Image:
         left = (target_w - fg.width) // 2
         top = (target_h - fg.height) // 2
         result = bg.copy()

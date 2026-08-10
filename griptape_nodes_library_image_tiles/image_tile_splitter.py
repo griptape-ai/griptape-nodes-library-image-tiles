@@ -134,7 +134,9 @@ class ImageTileSplitter(DataNode):
             dest = self._tile_file.build_file(file_name_base=f"{user_stem}_r{row:04d}_c{col:04d}")
             saved = await dest.awrite_bytes(tile_bytes)
             artifact = ImageUrlArtifact(saved.location)
-            manifest_tiles.append({"row": row, "col": col, "x": x, "y": y, "width": w, "height": h, "url": artifact.value})
+            manifest_tiles.append(
+                {"row": row, "col": col, "x": x, "y": y, "width": w, "height": h, "url": artifact.value}
+            )
 
         self._publish_outputs(manifest_tiles, tile_size, pad_to_fit, original_w, original_h, rows, cols)
 
@@ -155,7 +157,9 @@ class ImageTileSplitter(DataNode):
             dest = self._tile_file.build_file(file_name_base=f"{user_stem}_r{row:04d}_c{col:04d}")
             saved = dest.write_bytes(tile_bytes)
             artifact = ImageUrlArtifact(saved.location)
-            manifest_tiles.append({"row": row, "col": col, "x": x, "y": y, "width": w, "height": h, "url": artifact.value})
+            manifest_tiles.append(
+                {"row": row, "col": col, "x": x, "y": y, "width": w, "height": h, "url": artifact.value}
+            )
 
         self._publish_outputs(manifest_tiles, tile_size, pad_to_fit, original_w, original_h, rows, cols)
 
@@ -222,7 +226,9 @@ class ImageTileSplitter(DataNode):
         self.parameter_output_values["tile_count"] = len(manifest_tiles)
         self.parameter_output_values["rows"] = rows
         self.parameter_output_values["columns"] = cols
-        logger.info("Split %dx%d into %d tiles (%d rows × %d cols)", original_w, original_h, len(manifest_tiles), rows, cols)
+        logger.info(
+            "Split %dx%d into %d tiles (%d rows × %d cols)", original_w, original_h, len(manifest_tiles), rows, cols
+        )
 
     def _load_pil(self, value: Any) -> Image.Image:
         if isinstance(value, dict):

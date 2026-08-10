@@ -110,9 +110,7 @@ class Image360Viewer(DataNode):
 
         try:
             resolved = File(macro_path).resolve()
-            result = GriptapeNodes.handle_request(
-                CreateStaticFileDownloadUrlFromPathRequest(file_path=resolved)
-            )
+            result = GriptapeNodes.handle_request(CreateStaticFileDownloadUrlFromPathRequest(file_path=resolved))
             if isinstance(result, CreateStaticFileDownloadUrlResultSuccess):
                 return result.url
         except Exception:
