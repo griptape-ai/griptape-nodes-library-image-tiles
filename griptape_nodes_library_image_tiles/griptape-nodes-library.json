@@ -6,12 +6,21 @@
         "description": "Image tiling nodes: split images into square tiles for external editing, merge them back, and work with equirectangular panoramas.",
         "library_version": "0.1.0",
         "engine_version": "0.96.0",
-        "tags": ["Griptape", "Image", "Tiles", "Panorama", "360"],
+        "tags": [
+            "Griptape",
+            "Image",
+            "Tiles",
+            "Panorama",
+            "360"
+        ],
         "dependencies": {
-            "pip_dependencies": ["pillow", "numpy"]
+            "pip_dependencies": []
         },
         "declarations": [
-            { "type": "lifecycle_stage", "stage": "BETA" }
+            {
+                "type": "lifecycle_stage",
+                "stage": "BETA"
+            }
         ]
     },
     "widgets": [
@@ -40,7 +49,10 @@
                 "description": "Split an image into square tiles and output a manifest JSON string for reassembly.",
                 "display_name": "Image Tile Splitter",
                 "declarations": [
-                    { "type": "lifecycle_stage", "stage": "BETA" }
+                    {
+                        "type": "lifecycle_stage",
+                        "stage": "BETA"
+                    }
                 ]
             }
         },
@@ -52,7 +64,10 @@
                 "description": "Merge tiles back into a single image using a manifest JSON string from the splitter.",
                 "display_name": "Image Tile Merger",
                 "declarations": [
-                    { "type": "lifecycle_stage", "stage": "BETA" }
+                    {
+                        "type": "lifecycle_stage",
+                        "stage": "BETA"
+                    }
                 ]
             }
         },
@@ -64,7 +79,10 @@
                 "description": "Blend the left/right seam of a panoramic image to remove visible seams.",
                 "display_name": "360 Seam Blend",
                 "declarations": [
-                    { "type": "lifecycle_stage", "stage": "BETA" }
+                    {
+                        "type": "lifecycle_stage",
+                        "stage": "BETA"
+                    }
                 ]
             }
         },
@@ -76,7 +94,10 @@
                 "description": "Convert any image into a 2:1 equirectangular canvas by padding, cropping, or stretching.",
                 "display_name": "To LatLong 2:1",
                 "declarations": [
-                    { "type": "lifecycle_stage", "stage": "BETA" }
+                    {
+                        "type": "lifecycle_stage",
+                        "stage": "BETA"
+                    }
                 ]
             }
         },
@@ -88,7 +109,10 @@
                 "description": "Preview an equirectangular image in an interactive 360 spherical viewer.",
                 "display_name": "360 Image Viewer",
                 "declarations": [
-                    { "type": "lifecycle_stage", "stage": "BETA" }
+                    {
+                        "type": "lifecycle_stage",
+                        "stage": "BETA"
+                    }
                 ]
             }
         }
