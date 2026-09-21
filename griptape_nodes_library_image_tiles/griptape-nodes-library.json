@@ -14,7 +14,10 @@
             "360"
         ],
         "dependencies": {
-            "pip_dependencies": []
+            "pip_dependencies": [
+                "pillow",
+                "numpy"
+            ]
         },
         "declarations": [
             {
