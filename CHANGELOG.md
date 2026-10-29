@@ -10,4 +10,4 @@ the `library_version` in `griptape_nodes_library_image_tiles/griptape-nodes-libr
 
 <!-- Entries go in changelog.d/, one file each. See changelog.d/README.md. -->
 
-[Unreleased]: https://github.com/griptape-ai/griptape-nodes-library-image-tiles/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/griptape-ai/griptape-nodes-library-image-tiles/compare/478cf968ec36cae4a7f70bde10cbaa893e961488...HEAD
