@@ -7,7 +7,7 @@ from io import BytesIO
 from typing import Any
 
 from griptape.artifacts import ImageUrlArtifact
-from griptape_nodes.exe_types.core_types import Parameter, ParameterMode
+from griptape_nodes.exe_types.core_types import NodeError, Parameter, ParameterMode
 from griptape_nodes.exe_types.node_types import DataNode
 from griptape_nodes.exe_types.param_components.project_file_parameter import ProjectFileParameter
 from griptape_nodes.exe_types.param_types.parameter_image import ParameterImage
@@ -144,8 +144,8 @@ class ToLatLong2to1(DataNode):
                 bg = Image.new("RGB", (output_width, output_height), (0, 0, 0))
                 out = self._paste_centered(fg, bg, output_width, output_height)
             case _:
-                msg = f"Unknown fit_mode: {fit_mode!r}"
-                raise ValueError(msg)
+                msg = f"'Fit Mode' is set to {fit_mode!r}. Choose stretch, crop, pad_blur, or pad_black."
+                raise NodeError(msg, fields={"parameter": "fit_mode"})
 
         buf = BytesIO()
         out.save(buf, format="PNG")
@@ -160,16 +160,24 @@ class ToLatLong2to1(DataNode):
         self.parameter_output_values["aspect_ratio"] = out.width / max(1, out.height)
 
     def _load_pil(self, value: Any) -> Image.Image:
-        if isinstance(value, dict):
+        if value is None:
+            url = ""
+        elif isinstance(value, dict):
             url = value.get("value", "")
         elif hasattr(value, "value"):
             url = value.value
         else:
             url = str(value)
         if not url:
-            msg = "No image URL provided"
-            raise ValueError(msg)
-        return Image.open(BytesIO(File(url).read_bytes()))
+            msg = "Connect an image to 'Image'."
+            raise NodeError(msg)
+        try:
+            img = Image.open(BytesIO(File(url).read_bytes()))
+            img.load()
+        except Exception as e:
+            msg = "Could not read the image connected to 'Image'. Connect a PNG or JPEG."
+            raise NodeError(msg, fields={"parameter": "image", "reason": str(e)}) from e
+        return img
 
     def _resize_cover(self, img: Image.Image, target_w: int, target_h: int) -> Image.Image:
         scale = max(target_w / img.width, target_h / img.height)
