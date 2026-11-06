@@ -8,7 +8,7 @@ from typing import Any
 
 import numpy as np
 from griptape.artifacts import ImageUrlArtifact
-from griptape_nodes.exe_types.core_types import Parameter, ParameterMode
+from griptape_nodes.exe_types.core_types import NodeError, Parameter, ParameterMode
 from griptape_nodes.exe_types.node_types import DataNode
 from griptape_nodes.exe_types.param_components.project_file_parameter import ProjectFileParameter
 from griptape_nodes.exe_types.param_types.parameter_float import ParameterFloat
@@ -188,20 +188,28 @@ class SeamBlend360(DataNode):
             case "smooth":
                 return (1.0 - (3.0 * t**2 - 2.0 * t**3)).astype(np.float32)
             case _:
-                msg = f"Unknown blend_mode: {blend_mode!r}"
-                raise ValueError(msg)
+                msg = f"'Blend Mode' is set to {blend_mode!r}. Choose cosine, linear, or smooth."
+                raise NodeError(msg, fields={"parameter": "blend_mode"})
 
     def _load_pil(self, value: Any) -> Image.Image:
-        if isinstance(value, dict):
+        if value is None:
+            url = ""
+        elif isinstance(value, dict):
             url = value.get("value", "")
         elif hasattr(value, "value"):
             url = value.value
         else:
             url = str(value)
         if not url:
-            msg = "No image URL provided"
-            raise ValueError(msg)
-        return Image.open(BytesIO(File(url).read_bytes()))
+            msg = "Connect an image to 'Image'."
+            raise NodeError(msg, fields={"parameter": "image"})
+        try:
+            img = Image.open(BytesIO(File(url).read_bytes()))
+            img.load()
+        except Exception as e:
+            msg = "Could not read the image connected to 'Image'. Connect a PNG or JPEG."
+            raise NodeError(msg, fields={"parameter": "image", "reason": str(e)}) from e
+        return img
 
     def _apply_seam_blur(
         self,

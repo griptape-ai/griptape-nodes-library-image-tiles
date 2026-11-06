@@ -7,7 +7,7 @@ from io import BytesIO
 from typing import Any
 
 from griptape.artifacts import ImageUrlArtifact
-from griptape_nodes.exe_types.core_types import Parameter, ParameterMode
+from griptape_nodes.exe_types.core_types import NodeError, Parameter, ParameterMode
 from griptape_nodes.exe_types.node_types import DataNode
 from griptape_nodes.exe_types.param_components.project_file_parameter import ProjectFileParameter
 from griptape_nodes.exe_types.param_types.parameter_image import ParameterImage
@@ -20,12 +20,20 @@ from PIL import Image, ImageFilter
 
 logger = logging.getLogger(__name__)
 
+_MANIFEST_KEYS = ("original_width", "original_height", "rows", "columns", "tile_size", "tiles")
+
 
 def _parse_manifest(value: Any) -> dict[str, Any]:
     if isinstance(value, dict):
-        return value
-    msg = f"manifest_json must be a dict, got {type(value).__name__}"
-    raise ValueError(msg)
+        missing = [key for key in _MANIFEST_KEYS if key not in value]
+        if not missing:
+            return value
+        msg = (
+            "'Manifest JSON' is missing " + ", ".join(missing) + ". Connect the manifest output of Image Tile Splitter."
+        )
+        raise NodeError(msg, fields={"parameter": "manifest_json"})
+    msg = "'Manifest JSON' must be the manifest produced by Image Tile Splitter. Connect its manifest output."
+    raise NodeError(msg, fields={"parameter": "manifest_json", "received_type": type(value).__name__})
 
 
 class ImageTileMerger(DataNode):
@@ -141,8 +149,18 @@ class ImageTileMerger(DataNode):
         canvas = Image.new("RGBA", (columns * tile_size, rows * tile_size), (0, 0, 0, 0))
 
         for tile in manifest["tiles"]:
-            tile_data = File(tile["url"]).read_bytes()
-            tile_img = Image.open(BytesIO(tile_data)).convert("RGBA")
+            try:
+                tile_data = File(tile.get("url", "")).read_bytes()
+                tile_img = Image.open(BytesIO(tile_data)).convert("RGBA")
+            except Exception as e:
+                msg = (
+                    f"Could not read the tile at row {tile.get('row')}, column {tile.get('col')}. "
+                    "Run Image Tile Splitter again, or check that the tile file still exists."
+                )
+                raise NodeError(
+                    msg,
+                    fields={"parameter": "manifest_json", "tile_url": tile.get("url"), "reason": str(e)},
+                ) from e
             canvas.paste(tile_img, (tile["x"], tile["y"]))
 
         result = canvas.crop((0, 0, original_width, original_height))

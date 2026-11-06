@@ -4,8 +4,8 @@
     "metadata": {
         "author": "Griptape, Inc.",
         "description": "Image tiling nodes: split images into square tiles for external editing, merge them back, and work with equirectangular panoramas.",
-        "library_version": "0.1.0",
-        "engine_version": "0.96.0",
+        "library_version": "0.2.0",
+        "engine_version": "0.104.0",
         "tags": [
             "Griptape",
             "Image",

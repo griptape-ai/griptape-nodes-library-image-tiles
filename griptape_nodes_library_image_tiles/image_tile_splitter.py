@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from griptape.artifacts import ImageUrlArtifact
-from griptape_nodes.exe_types.core_types import Parameter, ParameterMode
+from griptape_nodes.exe_types.core_types import NodeError, Parameter, ParameterMode
 from griptape_nodes.exe_types.node_types import DataNode
 from griptape_nodes.exe_types.param_components.project_file_parameter import ProjectFileParameter
 from griptape_nodes.exe_types.param_types.parameter_image import ParameterImage
@@ -21,6 +21,7 @@ from griptape_nodes.utils import async_utils
 from PIL import Image
 
 logger = logging.getLogger(__name__)
+_DEFAULT_TILE_FILE = "tiles/tile.png"
 
 # Named tuple-style dataclass would be overkill for 8 fields used in one place.
 type _TileData = tuple[str, bytes, int, int, int, int, int, int]  # name, png_bytes, row, col, x, y, w, h
@@ -108,7 +109,7 @@ class ImageTileSplitter(DataNode):
         self._tile_file = ProjectFileParameter(
             node=self,
             name="tile_file",
-            default_filename="tiles/tile.png",
+            default_filename=_DEFAULT_TILE_FILE,
         )
         self._tile_file.add_parameter()
 
@@ -123,7 +124,7 @@ class ImageTileSplitter(DataNode):
         image_value = self.get_parameter_value("image")
         tile_size = int(self.get_parameter_value("tile_size") or 512)
         pad_to_fit = bool(self.get_parameter_value("pad_to_fit"))
-        user_stem = Path(self.get_parameter_value("tile_file") or self._tile_file._default_filename).stem
+        user_stem = Path(self.get_parameter_value("tile_file") or _DEFAULT_TILE_FILE).stem
 
         tiles_data, original_w, original_h, rows, cols = await async_utils.to_thread(
             self._compute_tile_data, image_value, tile_size, pad_to_fit
@@ -148,7 +149,7 @@ class ImageTileSplitter(DataNode):
         image_value = self.get_parameter_value("image")
         tile_size = int(self.get_parameter_value("tile_size") or 512)
         pad_to_fit = bool(self.get_parameter_value("pad_to_fit"))
-        user_stem = Path(self.get_parameter_value("tile_file") or self._tile_file._default_filename).stem
+        user_stem = Path(self.get_parameter_value("tile_file") or _DEFAULT_TILE_FILE).stem
 
         tiles_data, original_w, original_h, rows, cols = self._compute_tile_data(image_value, tile_size, pad_to_fit)
 
@@ -168,8 +169,8 @@ class ImageTileSplitter(DataNode):
     ) -> tuple[list[_TileData], int, int, int, int]:
         """Load the image and produce PNG bytes for every tile. Runs in a worker thread."""
         if tile_size <= 0:
-            msg = "tile_size must be greater than 0"
-            raise ValueError(msg)
+            msg = f"'Tile Size' must be greater than 0. It's set to {tile_size}."
+            raise NodeError(msg, fields={"parameter": "tile_size"})
 
         src = self._load_pil(image_value).convert("RGBA")
         original_width, original_height = src.size
@@ -231,13 +232,21 @@ class ImageTileSplitter(DataNode):
         )
 
     def _load_pil(self, value: Any) -> Image.Image:
-        if isinstance(value, dict):
+        if value is None:
+            url = ""
+        elif isinstance(value, dict):
             url = value.get("value", "")
         elif hasattr(value, "value"):
             url = value.value
         else:
             url = str(value)
         if not url:
-            msg = "No image URL provided"
-            raise ValueError(msg)
-        return Image.open(BytesIO(File(url).read_bytes()))
+            msg = "Connect an image to 'Image'."
+            raise NodeError(msg, fields={"parameter": "image"})
+        try:
+            img = Image.open(BytesIO(File(url).read_bytes()))
+            img.load()
+        except Exception as e:
+            msg = "Could not read the image connected to 'Image'. Connect a PNG or JPEG."
+            raise NodeError(msg, fields={"parameter": "image", "reason": str(e)}) from e
+        return img
