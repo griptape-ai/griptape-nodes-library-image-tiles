@@ -242,7 +242,7 @@ class ImageTileSplitter(DataNode):
             url = str(value)
         if not url:
             msg = "Connect an image to 'Image'."
-            raise NodeError(msg)
+            raise NodeError(msg, fields={"parameter": "image"})
         try:
             img = Image.open(BytesIO(File(url).read_bytes()))
             img.load()

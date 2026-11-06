@@ -29,10 +29,10 @@ def _parse_manifest(value: Any) -> dict[str, Any]:
         if not missing:
             return value
         msg = (
-            "'Manifest Json' is missing " + ", ".join(missing) + ". Connect the manifest output of Image Tile Splitter."
+            "'Manifest JSON' is missing " + ", ".join(missing) + ". Connect the manifest output of Image Tile Splitter."
         )
         raise NodeError(msg, fields={"parameter": "manifest_json"})
-    msg = "'Manifest Json' must be the manifest produced by Image Tile Splitter. Connect its manifest output."
+    msg = "'Manifest JSON' must be the manifest produced by Image Tile Splitter. Connect its manifest output."
     raise NodeError(msg, fields={"parameter": "manifest_json", "received_type": type(value).__name__})
 
 

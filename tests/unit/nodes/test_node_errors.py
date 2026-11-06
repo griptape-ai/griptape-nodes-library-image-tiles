@@ -10,7 +10,7 @@ from griptape_nodes_library_image_tiles.to_latlong_2to1 import ToLatLong2to1
 
 
 def test_manifest_must_be_a_dict() -> None:
-    with pytest.raises(NodeError, match="Manifest Json") as exc:
+    with pytest.raises(NodeError, match="Manifest JSON") as exc:
         _parse_manifest("not a dict")
     assert exc.value.fields == {"parameter": "manifest_json", "received_type": "str"}
 
@@ -29,8 +29,9 @@ def test_valid_manifest_passes_through() -> None:
 @pytest.mark.parametrize("value", [None, "", {"value": ""}])
 def test_missing_image_is_a_node_error(node_cls: type, value: object) -> None:
     node = object.__new__(node_cls)
-    with pytest.raises(NodeError, match="Connect an image to 'Image'"):
+    with pytest.raises(NodeError, match="Connect an image to 'Image'") as exc:
         node._load_pil(value)
+    assert exc.value.fields == {"parameter": "image"}
 
 
 @pytest.mark.parametrize("node_cls", [ImageTileSplitter, SeamBlend360, ToLatLong2to1])
